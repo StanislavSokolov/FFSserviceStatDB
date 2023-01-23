@@ -9,12 +9,16 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 public class URLRequestResponse {
 
@@ -163,6 +167,43 @@ public class URLRequestResponse {
             String respond = EntityUtils.toString(entity1);
             System.out.println(respond);
             return respond;
+        }
+    }
+
+    public static String getResponseFromURL(URL url, String token, String client, int method, String product_id, String price) throws IOException, URISyntaxException {
+
+        int methodNumber = method;
+        String reqBody = "";
+
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        httpURLConnection.setRequestProperty("Client-Id", client);
+        httpURLConnection.setRequestProperty("Api-Key", token);
+        httpURLConnection.setRequestProperty("Content-Type", "application/json");
+        httpURLConnection.setDoOutput(true);
+        OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream());
+        if (method == 1) reqBody = "{\"filter\":{\"visibility\": \"ALL\"},\"last_id\": \"\", \"limit\": 100}";
+        if (method == 2) reqBody = "{\"offer_id\": \"\",\"product_id\": " + product_id + ", \"sku\": 0}";
+//        if (method == 3) reqBody = "{\"dir\": \"ASC\", \"filter\": {\"since\": \"" + getDataCurrent() + "T00:00:00.000Z\"}, \"limit\": 5, \"offset\": 0, \"translit\": true, \"with\": {\"analytics_data\": true, \"financial_data\": true}}";
+        if (method == 4) reqBody = "{\"prices\": [{\"auto_action_enabled\": \"UNKNOWN\",\"min_price\": \"100\", \"offer_id\": \"\", \"old_price\": \"0\", \"price\": \"" + price + "\", \"product_id\": " + product_id + "}]}";
+        if (method == 3) reqBody = "{\"dir\": \"ASC\", \"filter\": {\"since\": \"" + getDataCurrent() + "T00:00:00.000Z\"}, \"limit\": 5, \"offset\": 0, \"translit\": true, \"with\": {\"analytics_data\": true, \"financial_data\": true}}";
+        System.out.println(reqBody);
+        writer.write(reqBody);
+        writer.close();
+
+//        System.out.println(reqBody);
+
+        try {
+            InputStream in = httpURLConnection.getInputStream();
+            Scanner scanner = new Scanner(in);
+            scanner.useDelimiter("\\A");
+            boolean hasInput = scanner.hasNext();
+            if(hasInput) {
+                return scanner.next();
+            } else {
+                return  null;
+            }
+        } finally {
+            httpURLConnection.disconnect();
         }
     }
 }

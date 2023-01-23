@@ -17,32 +17,60 @@ public class SQL {
     }
 
     public static Connection getConnection() throws SQLException, IOException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/data", "user","password");
+        return DriverManager.getConnection("jdbc:mysql://localhost/ffs", "user","password");
     }
 
-    public static void upDate(String dateCurrent, int sumSale, int sumOrder, int sumSaleMoney, String s) {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver").getDeclaredConstructor().newInstance();
-            try (Connection conn = getConnection()) {
-                boolean check = false;
-                String cdate = "";
-                Statement statement = conn.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM saleorderstat");
-                while (resultSet.next()) {
-                    cdate = resultSet.getString("cdate");
-                    if (cdate.equals(dateCurrent)) {
-                        check = true;
-                        statement.executeUpdate("UPDATE saleorderstat SET sumSale = " +  sumSale + ", sumOrder = " + sumOrder + ", sumSaleMoney = " + sumSaleMoney + ", popItem = '" + s + "' WHERE Id = " + resultSet.getInt("Id"));
-                        break;
+    public static void upDate(String dateCurrent, int sumSale, int sumOrder, int sumSaleMoney, String s, String shop) {
+        if (shop.equals("wb")) {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver").getDeclaredConstructor().newInstance();
+                try (Connection conn = getConnection()) {
+                    boolean check = false;
+                    String cdate = "";
+                    Statement statement = conn.createStatement();
+                    ResultSet resultSet = statement.executeQuery("SELECT * FROM saleorderstat");
+                    while (resultSet.next()) {
+                        cdate = resultSet.getString("cdate");
+                        if (cdate.equals(dateCurrent)) {
+                            check = true;
+                            statement.executeUpdate("UPDATE saleorderstat SET sumSale = " +  sumSale + ", sumOrder = " + sumOrder + ", sumSaleMoney = " + sumSaleMoney + ", popItem = '" + s + "' WHERE Id = " + resultSet.getInt("Id"));
+                            break;
+                        }
                     }
-                }
-                if (!check) {
-                    statement.executeUpdate("INSERT saleorderstat(cdate, sumSale, sumOrder, sumSaleMoney, popItem) VALUES ('" + dateCurrent + "', " + sumSale + ", " + sumOrder + ", " + sumSaleMoney + ", '" + s + "')");
-                }
+                    if (!check) {
+                        statement.executeUpdate("INSERT saleorderstat(cdate, sumSale, sumOrder, sumSaleMoney, popItem) VALUES ('" + dateCurrent + "', " + sumSale + ", " + sumOrder + ", " + sumSaleMoney + ", '" + s + "')");
+                    }
 
+                }
+            } catch (Exception ex) {
+                System.out.println(ex);
             }
-        } catch (Exception ex) {
-            System.out.println(ex);
         }
+        if (shop.equals("ozon")) {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver").getDeclaredConstructor().newInstance();
+                try (Connection conn = getConnection()) {
+                    boolean check = false;
+                    String cdate = "";
+                    Statement statement = conn.createStatement();
+                    ResultSet resultSet = statement.executeQuery("SELECT * FROM salestat");
+                    while (resultSet.next()) {
+                        cdate = resultSet.getString("cdate");
+                        if (cdate.equals(dateCurrent)) {
+                            check = true;
+                            statement.executeUpdate("UPDATE salestat SET sumSale = " +  sumSale + ", sumOrder = " + sumOrder + ", sumSaleMoney = " + sumSaleMoney + ", popItem = '" + s + "' WHERE Id = " + resultSet.getInt("Id"));
+                            break;
+                        }
+                    }
+                    if (!check) {
+                        statement.executeUpdate("INSERT salestat(cdate, sumSale, sumOrder, sumSaleMoney, popItem) VALUES ('" + dateCurrent + "', " + sumSale + ", " + sumOrder + ", " + sumSaleMoney + ", '" + s + "')");
+                    }
+
+                }
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
+        }
+
     }
 }
