@@ -204,25 +204,48 @@ public class Update extends Thread {
 
         System.out.println(answerString);
 
-        ItemShop productPopular = null;
-        if (!products.isEmpty()) {
-            products.sort((o1, o2) -> o2.getRating() - o1.getRating());
-            productPopular = products.get(0);
-        }
+        if (!answerString.equals("")) {
+            ItemShop productPopular = null;
+            if (!products.isEmpty()) {
+                products.sort((o1, o2) -> o2.getRating() - o1.getRating());
+                productPopular = products.get(0);
+            }
 
-        int sumSale = 0;
-        int sumOrder = 0;
-        int sumSaleMoney = 0;
+            int sumSale = 0;
+            int sumOrder = 0;
+            int sumSaleMoney = 0;
 
-        for (ItemShop ishop : products) {
-            sumSale = sumSale + ishop.getSale();
-            sumOrder = sumOrder + ishop.getOrder();
-            String forPay = ishop.getForPay();
-            sumSaleMoney = (int) (sumSaleMoney + Float.parseFloat(forPay));
-        }
+            for (ItemShop ishop : products) {
+                sumSale = sumSale + ishop.getSale();
+                sumOrder = sumOrder + ishop.getOrder();
+                String forPay = ishop.getForPay();
+                sumSaleMoney = (int) (sumSaleMoney + Float.parseFloat(forPay));
+            }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        SQL.upDate(URLRequestResponse.getDataCurrent(), sumSale, sumOrder, sumSaleMoney, productPopular.getSubject() + " " + productPopular.getSupplierArticle(), "ozon");
+            SQL.upDate(URLRequestResponse.getDataCurrent(), sumSale, sumOrder, sumSaleMoney, productPopular.getSubject() + " " + productPopular.getSupplierArticle(), "ozon");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        } else {
+            ItemShop productPopular = null;
+            if (!products.isEmpty()) {
+                products.sort((o1, o2) -> o2.getRating() - o1.getRating());
+                productPopular = products.get(0);
+            }
+
+            int sumSale = 0;
+            int sumOrder = 0;
+            int sumSaleMoney = 0;
+
+            for (ItemShop ishop : products) {
+                sumSale = sumSale + ishop.getSale();
+                sumOrder = sumOrder + ishop.getOrder();
+                String forPay = ishop.getForPay();
+                sumSaleMoney = (int) (sumSaleMoney + Float.parseFloat(forPay));
+            }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            SQL.upDate(URLRequestResponse.getDataCurrent(), 0, 0, 0, "", "ozon");
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        }
     }
 }
