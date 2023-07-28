@@ -1,6 +1,7 @@
 package org.example;
 
-import org.example.model.Item;
+import org.example.model.Product;
+import org.example.model.Stock;
 import org.example.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -10,7 +11,8 @@ public class FFSserviceStatDB {
     public static void main( String[] args ) {
 
         SessionFactory sessionFactory = new Configuration().addAnnotatedClass(User.class).
-                addAnnotatedClass(Item.class).buildSessionFactory();
+                addAnnotatedClass(Product.class).
+                addAnnotatedClass(Stock.class).buildSessionFactory();
         Session session = sessionFactory.getCurrentSession();
 
         try {

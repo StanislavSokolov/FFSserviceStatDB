@@ -30,6 +30,12 @@ public class Product {
     @OneToMany(mappedBy = "owner")
     private List<Stock> stocks;
 
+    @OneToMany(mappedBy = "owner")
+    private List<Item> items;
+
+    public Product() {
+    }
+
     public Product(String supplierArticle, String quantity, String quantityFull, String nmId, String subject, String warehouseName, String shopName, List<Stock> stocks) {
         this.supplierArticle = supplierArticle;
         this.quantity = quantity;
@@ -112,14 +118,6 @@ public class Product {
     public void setStocks(List<Stock> stocks) {
         this.stocks = stocks;
     }
-//    @ManyToOne
-//    @JoinColumn(name = "person_id", referencedColumnName = "id")
-//    private User owner;
-
-    public Product() {
-    }
-
-
 }
 
 

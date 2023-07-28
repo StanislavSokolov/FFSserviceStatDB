@@ -1,9 +1,6 @@
 package org.example.model;
 
-import org.example.model.Product;
-
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "Stock")
