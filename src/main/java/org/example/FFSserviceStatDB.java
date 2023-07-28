@@ -1,30 +1,28 @@
 package org.example;
 
 import org.example.model.Item;
-import org.example.model.Person;
+import org.example.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class FFSserviceStatDB {
     public static void main( String[] args ) {
 
-        SessionFactory sessionFactory = new Configuration().addAnnotatedClass(Person.class).
+        SessionFactory sessionFactory = new Configuration().addAnnotatedClass(User.class).
                 addAnnotatedClass(Item.class).buildSessionFactory();
         Session session = sessionFactory.getCurrentSession();
 
         try {
             session.beginTransaction();
 
-            Person person = new Person("Nanya", 26, "Oku", "nn@mail.ru");
+//            Person person = new Person("Nanya", 26, "Oku", "nn@mail.ru");
 
-            Item item = new Item("Idiot", person);
+//            Item item = new Item("Idiot", person);
 
-            person.setItems(new ArrayList<>(Collections.singletonList(item)));
+//            person.setItems(new ArrayList<>(Collections.singletonList(item)));
 
-            session.save(person);
+//            session.save(person);
 
 
 

@@ -1,93 +1,125 @@
 package org.example.model;
 
+import javax.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "Product")
 public class Product {
-    private String supplierArticle = "";
-    private int quantity = 0;
-    private int quantityFull = 0;
-    private int nmId = 0;
-    private String subject = "";
-    private int price = 0;
-    private int discount = 0;
-    private int promoCode = 0;
-    private int total = 0;
 
-    public int getTotal() {
-        return total;
-    }
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    public void setTotal(int total) {
-        this.total = total;
-    }
+    @Column(name = "supplierArticle")
+    private String supplierArticle;
+    @Column(name = "quantity")
+    private String quantity;
+    @Column(name = "quantityFull")
+    private String quantityFull;
+    @Column(name = "nmId")
+    private String nmId;
+    @Column(name = "subject")
+    private String subject;
+    @Column(name = "warehouseName")
+    private String warehouseName;
+    @Column(name = "shopName")
+    private String shopName;
 
-    public Product(String supplierArticle, int quantity, int quantityFull, int nmId, String subject) {
+    @OneToMany(mappedBy = "owner")
+    private List<Stock> stocks;
+
+    public Product(String supplierArticle, String quantity, String quantityFull, String nmId, String subject, String warehouseName, String shopName, List<Stock> stocks) {
         this.supplierArticle = supplierArticle;
         this.quantity = quantity;
         this.quantityFull = quantityFull;
         this.nmId = nmId;
         this.subject = subject;
+        this.warehouseName = warehouseName;
+        this.shopName = shopName;
+        this.stocks = stocks;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public int getId() {
+        return id;
     }
 
-    public void setQuantityFull(int quantityFull) {
-        this.quantityFull = quantityFull;
-    }
-
-    public void setPromoCode(int promoCode) {
-        this.promoCode = promoCode;
-    }
-
-    public int getPromoCode() {
-        return promoCode;
-    }
-
-    public void setSupplierArticle(String supplierArticle) {
-        this.supplierArticle = supplierArticle;
-    }
-
-    public void setNmId(int nmId) {
-        this.nmId = nmId;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public void setDiscount(int discount) {
-        this.discount = discount;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getSupplierArticle() {
         return supplierArticle;
     }
 
-    public int getQuantity() {
+    public void setSupplierArticle(String supplierArticle) {
+        this.supplierArticle = supplierArticle;
+    }
+
+    public String getQuantity() {
         return quantity;
     }
 
-    public int getQuantityFull() {
+    public void setQuantity(String quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getQuantityFull() {
         return quantityFull;
     }
 
-    public int getNmId() {
+    public void setQuantityFull(String quantityFull) {
+        this.quantityFull = quantityFull;
+    }
+
+    public String getNmId() {
         return nmId;
+    }
+
+    public void setNmId(String nmId) {
+        this.nmId = nmId;
     }
 
     public String getSubject() {
         return subject;
     }
 
-    public int getPrice() {
-        return price;
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
-    public int getDiscount() {
-        return discount;
+    public String getWarehouseName() {
+        return warehouseName;
     }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
+    public List<Stock> getStocks() {
+        return stocks;
+    }
+
+    public void setStocks(List<Stock> stocks) {
+        this.stocks = stocks;
+    }
+//    @ManyToOne
+//    @JoinColumn(name = "person_id", referencedColumnName = "id")
+//    private User owner;
+
+    public Product() {
+    }
+
+
 }
+
+
