@@ -1,3 +1,5 @@
+package org.example.model;
+
 public class Product {
     private String supplierArticle = "";
     private int quantity = 0;

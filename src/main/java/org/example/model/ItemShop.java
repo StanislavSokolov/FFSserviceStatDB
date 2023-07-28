@@ -1,3 +1,5 @@
+package org.example.model;
+
 public class ItemShop {
     private String subject = "";
     private String supplierArticle = "";
