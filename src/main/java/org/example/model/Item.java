@@ -23,6 +23,8 @@ public class Item {
     private String odid;
     @Column(name = "oblastOkrugName")
     private String oblastOkrugName;
+    @Column(name = "warehouseName")
+    private String warehouseName;
     @Column(name = "status")
     private String status;
 
@@ -33,13 +35,14 @@ public class Item {
     public Item() {
     }
 
-    public Item(String cdate, String ctime, int finishedPrice, int forPay, String odid, String oblastOkrugName, String status, Product owner) {
-        this.cdate = cdate;
-        this.ctime = ctime;
+    public Item(String cdate, int finishedPrice, int forPay, String odid, String oblastOkrugName, String warehouseName, String status, Product owner) {
+        this.cdate = cdate.substring(0, 10);
+        this.ctime = cdate.substring(11, 19);
         this.finishedPrice = finishedPrice;
         this.forPay = forPay;
         this.odid = odid;
         this.oblastOkrugName = oblastOkrugName;
+        this.warehouseName = warehouseName;
         this.status = status;
         this.owner = owner;
     }
@@ -98,6 +101,14 @@ public class Item {
 
     public void setOblastOkrugName(String oblastOkrugName) {
         this.oblastOkrugName = oblastOkrugName;
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
     }
 
     public String getStatus() {
