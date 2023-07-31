@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "Product")
+@Table(name = "product")
 public class Product {
 
     @Id
@@ -14,16 +14,20 @@ public class Product {
 
     @Column(name = "supplierArticle")
     private String supplierArticle;
-    @Column(name = "quantity")
-    private String quantity;
-    @Column(name = "quantityFull")
-    private String quantityFull;
+//    @Column(name = "quantity")
+//    private String quantity;
+//    @Column(name = "quantityFull")
+//    private String quantityFull;
     @Column(name = "nmId")
     private String nmId;
     @Column(name = "subject")
     private String subject;
-    @Column(name = "warehouseName")
-    private String warehouseName;
+//    @Column(name = "warehouseName")
+//    private String warehouseName;
+    @Column(name = "price")
+    private int price;
+    @Column(name = "discount")
+    private int discount;
     @Column(name = "shopName")
     private String shopName;
 
@@ -36,15 +40,13 @@ public class Product {
     public Product() {
     }
 
-    public Product(String supplierArticle, String quantity, String quantityFull, String nmId, String subject, String warehouseName, String shopName, List<Stock> stocks) {
+    public Product(String supplierArticle, String nmId, String subject, int price, int discount, String shopName) {
         this.supplierArticle = supplierArticle;
-        this.quantity = quantity;
-        this.quantityFull = quantityFull;
         this.nmId = nmId;
         this.subject = subject;
-        this.warehouseName = warehouseName;
+        this.price = price;
+        this.discount = discount;
         this.shopName = shopName;
-        this.stocks = stocks;
     }
 
     public int getId() {
@@ -63,22 +65,6 @@ public class Product {
         this.supplierArticle = supplierArticle;
     }
 
-    public String getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(String quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getQuantityFull() {
-        return quantityFull;
-    }
-
-    public void setQuantityFull(String quantityFull) {
-        this.quantityFull = quantityFull;
-    }
-
     public String getNmId() {
         return nmId;
     }
@@ -95,14 +81,6 @@ public class Product {
         this.subject = subject;
     }
 
-    public String getWarehouseName() {
-        return warehouseName;
-    }
-
-    public void setWarehouseName(String warehouseName) {
-        this.warehouseName = warehouseName;
-    }
-
     public String getShopName() {
         return shopName;
     }
@@ -117,6 +95,14 @@ public class Product {
 
     public void setStocks(List<Stock> stocks) {
         this.stocks = stocks;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
     }
 }
 

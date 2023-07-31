@@ -3,7 +3,7 @@ package org.example.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Stock")
+@Table(name = "stock")
 public class Stock {
 
     @Id
@@ -15,6 +15,8 @@ public class Stock {
     private String warehouseName;
     @Column(name = "quantity")
     private int quantity;
+    @Column(name = "quantityFull")
+    private int quantityFull;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
@@ -23,9 +25,10 @@ public class Stock {
     public Stock() {
     }
 
-    public Stock(String warehouseName, int quantity, Product owner) {
+    public Stock(String warehouseName, int quantity, int quantityFull, Product owner) {
         this.warehouseName = warehouseName;
         this.quantity = quantity;
+        this.quantityFull = quantityFull;
         this.owner = owner;
     }
 
