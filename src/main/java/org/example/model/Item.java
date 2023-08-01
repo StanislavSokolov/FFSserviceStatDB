@@ -15,6 +15,10 @@ public class Item {
     private String cdate;
     @Column(name = "ctime")
     private String ctime;
+    @Column(name = "sdate")
+    private String sdate;
+    @Column(name = "stime")
+    private String stime;
     @Column(name = "finishedPrice")
     private int finishedPrice;
     @Column(name = "forPay")
@@ -35,9 +39,21 @@ public class Item {
     public Item() {
     }
 
-    public Item(String cdate, int finishedPrice, int forPay, String odid, String oblastOkrugName, String warehouseName, String status, Product owner) {
-        this.cdate = cdate.substring(0, 10);
-        this.ctime = cdate.substring(11, 19);
+    public Item(String cdate, String sdate, int finishedPrice, int forPay, String odid, String oblastOkrugName, String warehouseName, String status, Product owner) {
+        if (cdate.equals("")) {
+            this.cdate = "";
+            this.ctime = "";
+        } else {
+            this.cdate = cdate.substring(0, 10);
+            this.ctime = cdate.substring(11, 19);
+        }
+        if (sdate.equals("")) {
+            this.sdate = "";
+            this.stime = "";
+        } else {
+            this.sdate = sdate.substring(0, 10);
+            this.stime = sdate.substring(11, 19);
+        }
         this.finishedPrice = finishedPrice;
         this.forPay = forPay;
         this.odid = odid;
@@ -109,6 +125,22 @@ public class Item {
 
     public void setWarehouseName(String warehouseName) {
         this.warehouseName = warehouseName;
+    }
+
+    public String getSdate() {
+        return sdate;
+    }
+
+    public void setSdate(String sdate) {
+        this.sdate = sdate;
+    }
+
+    public String getStime() {
+        return stime;
+    }
+
+    public void setStime(String stime) {
+        this.stime = stime;
     }
 
     public String getStatus() {

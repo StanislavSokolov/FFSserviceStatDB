@@ -22,14 +22,14 @@ public class Update extends Thread {
 
     @Override
     public void run() {
-        int count = 1;
+        int count = 0;
 
         super.run();
         while (true) {
             try {
                 update(count);
                 sleep(300000);
-                if (count > 4) count = 0;
+                if (count > 1) count = 0;
                 else count++;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -58,7 +58,7 @@ public class Update extends Thread {
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStandartWB());
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
-                                    System.out.println(response);
+//                                    System.out.println(response);
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
                                         List<Product> products = session.createQuery("FROM Product WHERE nmId LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString()).getResultList();
@@ -135,6 +135,39 @@ public class Update extends Thread {
                 for (User user : users) {
                     if (user.getNameShopWB() != null) {
                         if (user.getTokenStatisticWB() != null) {
+                            generetedURL = URLRequestResponse.generateURL("wb", "orders", user.getTokenStatisticWB());
+                            try {
+                                response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
+                                if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
+                                    System.out.println(response);
+                                    JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
+                                    for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
+                                        List<Item> items = session.createQuery("FROM Item WHERE odid LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString()).getResultList();
+                                        if (items.isEmpty()) {
+                                            List<Product> products = session.createQuery("FROM Product WHERE nmId LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString()).getResultList();
+                                            String status = "ordered";
+                                            if (jsonObject.getJSONArray("price").getJSONObject(i).get("isCancel").toString().equals("true")) status = "cancelled";
+                                            Item item = new Item(jsonObject.getJSONArray("price").getJSONObject(i).get("date").toString(),
+                                                    "",
+                                                    (int) ((Float.parseFloat(jsonObject.getJSONArray("price").getJSONObject(i).get("totalPrice").toString())) * (1 - (Float.parseFloat(jsonObject.getJSONArray("price").getJSONObject(i).get("discountPercent").toString()))/100)),
+                                                    0,
+                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString(),
+                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("oblast").toString(),
+                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString(),
+                                                    status,
+                                                    products.get(0));
+                                            session.save(item);
+                                        } else {
+                                            if (jsonObject.getJSONArray("price").getJSONObject(i).get("isCancel").toString().equals("true"))
+                                                session.createQuery("update Item set status = 'cancelled' WHERE id = '"
+                                                    + items.get(0).getId()
+                                                    + "'").executeUpdate();
+                                        }
+                                    }
+                                }
+                            } catch (IOException | URISyntaxException e) {
+                                e.printStackTrace();
+                            }
                             generetedURL = URLRequestResponse.generateURL("wb", "sales", user.getTokenStatisticWB());
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
@@ -145,15 +178,32 @@ public class Update extends Thread {
                                         List<Item> items = session.createQuery("FROM Item WHERE odid LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString()).getResultList();
                                         if (items.isEmpty()) {
                                             List<Product> products = session.createQuery("FROM Product WHERE nmId LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString()).getResultList();
-                                            Item item = new Item(jsonObject.getJSONArray("price").getJSONObject(i).get("date").toString(),
+                                            Item item = new Item("",
+                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("date").toString(),
                                                     (int) (Float.parseFloat(jsonObject.getJSONArray("price").getJSONObject(i).get("finishedPrice").toString())),
                                                     (int) (Float.parseFloat(jsonObject.getJSONArray("price").getJSONObject(i).get("forPay").toString())),
                                                     jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString(),
                                                     jsonObject.getJSONArray("price").getJSONObject(i).get("oblastOkrugName").toString(),
                                                     jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString(),
-                                                    "sale",
+                                                    "sold",
                                                     products.get(0));
                                             session.save(item);
+                                        } else {
+                                            if (jsonObject.getJSONArray("price").getJSONObject(i).get("saleID").toString().substring(0, 0).equals("S"))
+                                                session.createQuery("update Item set status = 'sold' WHERE id = '"
+                                                    + items.get(0).getId()
+                                                    + "'").executeUpdate();
+                                            if (jsonObject.getJSONArray("price").getJSONObject(i).get("saleID").toString().substring(0, 0).equals("R")) {
+                                                session.createQuery("update Item set status = 'returned' WHERE id = '"
+                                                        + items.get(0).getId()
+                                                        + "'").executeUpdate();
+                                                session.createQuery("update Item set finishedPrice = '0' WHERE id = '"
+                                                        + items.get(0).getId()
+                                                        + "'").executeUpdate();
+                                                session.createQuery("update Item set forPay = '0' WHERE id = '"
+                                                        + items.get(0).getId()
+                                                        + "'").executeUpdate();
+                                            }
                                         }
                                     }
                                 }
