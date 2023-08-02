@@ -7,13 +7,11 @@ import org.example.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -89,7 +87,7 @@ public class Update extends Thread {
                             generetedURL = URLRequestResponse.generateURL("wb", "stocks", user.getTokenStatisticWB());
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
-                                System.out.println(response);
+//                                System.out.println(response);
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
@@ -139,7 +137,7 @@ public class Update extends Thread {
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
-                                    System.out.println(response);
+//                                    System.out.println(response);
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
                                         List<Item> items = session.createQuery("FROM Item WHERE odid LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString()).getResultList();
@@ -172,7 +170,7 @@ public class Update extends Thread {
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
-                                    System.out.println(response);
+//                                    System.out.println(response);
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
                                         List<Item> items = session.createQuery("FROM Item WHERE odid LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString()).getResultList();
@@ -214,9 +212,89 @@ public class Update extends Thread {
                     }
                 }
             }
+
+            for (User user : users) {
+                if (user.getNameShopOzon() != null) {
+                    if (user.getTokenClientOzon() != null) {
+                        if (user.getTokenStatisticOzon() != null) {
+                            generetedURL = URLRequestResponse.generateURL("ozon", "list", "");
+                            try {
+                                response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenClientOzon(),  user.getTokenStatisticOzon(), "list", "", "");
+                            } catch (IOException | URISyntaxException e) {
+                                e.printStackTrace();
+                            }
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONObject jsonObject1 = new JSONObject(String.valueOf(jsonObject.get("result")));
+                            generetedURL = URLRequestResponse.generateURL("ozon", "info", "0");
+                            String answerString = "";
+                            for (int i = 0; i < jsonObject1.getJSONArray("items").length(); i++) {
+//                                System.out.println(jsonObject1.getJSONArray("items").getJSONObject(i).get("product_id"));
+                                try {
+                                    response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenClientOzon(), user.getTokenStatisticOzon(), "info", jsonObject1.getJSONArray("items").getJSONObject(i).get("product_id").toString(), "0");
+                                } catch (IOException | URISyntaxException e) {
+                                    e.printStackTrace();
+                                }
+                                JSONObject jsonObject2 = new JSONObject(response);
+                                JSONObject jsonObject3 = new JSONObject(String.valueOf(jsonObject2.get("result")));
+                                JSONObject jsonObject4 = new JSONObject(String.valueOf(jsonObject3.get("stocks")));
+
+                                List<Product> products = session.createQuery("FROM Product WHERE nmId LIKE " + jsonObject3.get("id").toString()).getResultList();
+                                if (products.isEmpty()) {
+                                    Product product = new Product(jsonObject3.get("offer_id").toString(),
+                                            jsonObject3.get("id").toString(),
+                                            jsonObject3.get("name").toString(),
+                                            (int) Float.parseFloat(jsonObject3.get("old_price").toString()),
+                                            (int) (100 * (1 - (Float.parseFloat(jsonObject3.get("price").toString()))/(Float.parseFloat(jsonObject3.get("old_price").toString())))),
+                                            "OZON");
+                                    session.save(product);
+                                } else {
+                                    session.createQuery("update Product set price = "
+                                            + (int) Float.parseFloat(jsonObject3.get("old_price").toString())
+                                            + " WHERE nmId = '" + jsonObject3.get("id").toString() + "'").executeUpdate();
+                                    session.createQuery("update Product set discount = "
+                                            + (int) (100 * (1 - (Float.parseFloat(jsonObject3.get("price").toString()))/(Float.parseFloat(jsonObject3.get("old_price").toString()))))
+                                            + " WHERE nmId = '" + jsonObject3.get("id").toString() + "'").executeUpdate();
+                                }
+//                                  answerString = answerString
+//                                        + "Наименование: "
+//                                        + jsonObject3.get("name").toString()
+//                                        + "\n"
+//                                        + "Артикул: "
+//                                        + jsonObject3.get("id").toString()
+//                                        + "\n"
+//                                        + "Цена: "
+//                                        + jsonObject3.get("old_price").toString()
+//                                        + "\n"
+//                                        + "С учетом скидки: "
+//                                        + jsonObject3.get("price").toString()
+//                                        + "\n"
+//                                        + "Остаток на складе: "
+//                                        + jsonObject4.get("present").toString()
+//                                        + "\n"
+//                                        + "Товары в пути: "
+//                                        + jsonObject4.get("reserved").toString()
+//                                        + "\n"
+//                                        + "Ожидаемая выручка: "
+//                                        + "\n"
+//                                        + "\n";
+                            }
+//                            System.out.println(answerString);
+                        }
+                    }
+
+
+                }
+            }
             session.getTransaction().commit();
         } finally {
             sessionFactory.close();
         }
+    }
+
+    private int delimiter(String s, String delimiter) {
+        String str = s;
+        String[] subStr;
+        subStr = str.split(delimiter); // Разделения строки str с помощью метода split()
+        return Integer.parseInt(subStr[0]);
     }
 }

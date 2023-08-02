@@ -55,103 +55,18 @@ public class URLRequestResponse {
                 dataAPI = "https://suppliers-api.wildberries.ru";
                 dataMethod = "/public/api/v1/updatePromocodes";
             }
+        } else if (shopNumber.equals("ozon")) {
+            dataAPI = "https://api-seller.ozon.ru";
+            if (methodNumber.equals("list"))
+                dataMethod = "/v2/product/list";
+            if (methodNumber.equals("info"))
+                dataMethod = "/v2/product/info";
+            if (methodNumber.equals("fbo/list"))
+                dataMethod = "/v2/posting/fbo/list";
+            if (methodNumber.equals("import/prices"))
+                dataMethod = "/v1/product/import/prices";
         }
 
-        URL url = null;
-        try {
-            url = new URL(dataAPI + dataMethod);
-            System.out.println(url.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return url;
-    }
-
-    public static URL generateURL(int shop, int method, String token) {
-        int shopNumber = shop;
-        int methodNumber = method;
-        String dataAPI = null;
-        String dataMethod = null;
-        switch (shopNumber){
-            case (2):
-                dataAPI = "https://suppliers-api.wildberries.ru";
-//                dataAPI = "https://statistics-api.wildberries.ru";
-                switch (methodNumber){
-                    case (1):
-                        dataMethod = "/public/api/v1/info?quantity=0";
-                        break;
-                    case (2):
-                        dataMethod = "/public/api/v1/prices";
-                        break;
-                    case (3):
-                        dataMethod = "/public/api/v1/updateDiscounts";
-                        break;
-                    case (4):
-                        dataMethod = "/public/api/v1/updatePromocodes";
-                        break;
-                    case (5):
-//                        dataAPI = "https://suppliers-stats.wildberries.ru";
-                        dataAPI = "https://statistics-api.wildberries.ru";
-                        dataMethod = "/api/v1/supplier/stocks?dateFrom=" + getDataCurrent() + "T00%3A00%3A00.000Z&key=" + token;
-                        break;
-                    case (6):
-//                        dataAPI = "https://suppliers-stats.wildberries.ru";
-                        dataAPI = "https://statistics-api.wildberries.ru";
-                        dataMethod = "/api/v1/supplier/sales?dateFrom=" + getData(-7) + "T00%3A00%3A00.000Z&key=" + token;
-                        break;
-                    case (7):
-//                        dataAPI = "https://suppliers-stats.wildberries.ru";
-                        dataAPI = "https://statistics-api.wildberries.ru";
-                        dataMethod = "/api/v1/supplier/orders?dateFrom=" + getData(-7) + "T00%3A00%3A00.000Z&key=" + token;
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case (1):
-                dataAPI = "https://suppliers-api.wildberries.ru";
-                switch (methodNumber){
-                    case (1):
-                        dataMethod = "/public/api/v1/info?quantity=0";
-                        break;
-                    case (2):
-                        dataMethod = "/public/api/v1/prices";
-                        break;
-                    case (3):
-                        dataMethod = "/public/api/v1/updateDiscounts";
-                        break;
-                    case (4):
-                        dataMethod = "/public/api/v1/updatePromocodes";
-                        break;
-                    case (5):
-
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case (3):
-                dataAPI = "https://api-seller.ozon.ru";
-                switch (methodNumber){
-                    case (1):
-                        dataMethod = "/v2/product/list";
-                        break;
-                    case (2):
-                        dataMethod = "/v2/product/info";
-                        break;
-                    case (3):
-                        dataMethod = "/v2/posting/fbo/list";
-                        break;
-                    case (4):
-                        dataMethod = "/v1/product/import/prices";
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            default:
-                break;
-        }
         URL url = null;
         try {
             url = new URL(dataAPI + dataMethod);
@@ -232,22 +147,9 @@ public class URLRequestResponse {
         }
     }
 
-    public static String getResponseFromURL(URL url) throws IOException, URISyntaxException {
-        final CloseableHttpClient httpclient = HttpClients.createDefault();
-        final HttpUriRequest httpGet = new HttpGet(url.toURI());
-        try (CloseableHttpResponse response1 = httpclient.execute(httpGet))
+    public static String getResponseFromURL(URL url, String token, String client, String method, String product_id, String price) throws IOException, URISyntaxException {
 
-        {
-            final HttpEntity entity1 = response1.getEntity();
-            String respond = EntityUtils.toString(entity1);
-//            System.out.println(respond);
-            return respond;
-        }
-    }
-
-    public static String getResponseFromURL(URL url, String token, String client, int method, String product_id, String price) throws IOException, URISyntaxException {
-
-        int methodNumber = method;
+        String methodNumber = method;
         String reqBody = "";
 
         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -256,16 +158,14 @@ public class URLRequestResponse {
         httpURLConnection.setRequestProperty("Content-Type", "application/json");
         httpURLConnection.setDoOutput(true);
         OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream());
-        if (method == 1) reqBody = "{\"filter\":{\"visibility\": \"ALL\"},\"last_id\": \"\", \"limit\": 100}";
-        if (method == 2) reqBody = "{\"offer_id\": \"\",\"product_id\": " + product_id + ", \"sku\": 0}";
-//        if (method == 3) reqBody = "{\"dir\": \"ASC\", \"filter\": {\"since\": \"" + getDataCurrent() + "T00:00:00.000Z\"}, \"limit\": 5, \"offset\": 0, \"translit\": true, \"with\": {\"analytics_data\": true, \"financial_data\": true}}";
-        if (method == 4) reqBody = "{\"prices\": [{\"auto_action_enabled\": \"UNKNOWN\",\"min_price\": \"100\", \"offer_id\": \"\", \"old_price\": \"0\", \"price\": \"" + price + "\", \"product_id\": " + product_id + "}]}";
-        if (method == 3) reqBody = "{\"dir\": \"ASC\", \"filter\": {\"since\": \"" + getDataCurrent() + "T00:00:00.000Z\"}, \"limit\": 5, \"offset\": 0, \"translit\": true, \"with\": {\"analytics_data\": true, \"financial_data\": true}}";
-        System.out.println(reqBody);
+        if (methodNumber.equals("list")) reqBody = "{\"filter\":{\"visibility\": \"ALL\"},\"last_id\": \"\", \"limit\": 100}";
+        if (methodNumber.equals("info")) reqBody = "{\"offer_id\": \"\",\"product_id\": " + product_id + ", \"sku\": 0}";
+        if (methodNumber.equals("fbo/list")) reqBody = "{\"dir\": \"ASC\", \"filter\": {\"since\": \"" + getDataCurrent() + "T00:00:00.000Z\"}, \"limit\": 5, \"offset\": 0, \"translit\": true, \"with\": {\"analytics_data\": true, \"financial_data\": true}}";
+        if (methodNumber.equals("import/prices")) reqBody = "{\"prices\": [{\"auto_action_enabled\": \"UNKNOWN\",\"min_price\": \"100\", \"offer_id\": \"\", \"old_price\": \"0\", \"price\": \"" + price + "\", \"product_id\": " + product_id + "}]}";
         writer.write(reqBody);
         writer.close();
 
-//        System.out.println(reqBody);
+        System.out.println(reqBody);
 
         try {
             InputStream in = httpURLConnection.getInputStream();
