@@ -26,7 +26,7 @@ public class Update extends Thread {
         while (true) {
             try {
                 update(count);
-                sleep(300000);
+                sleep(10000);
                 if (count > 1) count = 0;
                 else count++;
             } catch (InterruptedException e) {
@@ -87,7 +87,7 @@ public class Update extends Thread {
                             generetedURL = URLRequestResponse.generateURL("wb", "stocks", user.getTokenStatisticWB());
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
-//                                System.out.println(response);
+                                System.out.println(response);
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
@@ -105,7 +105,8 @@ public class Update extends Thread {
                                             if (stocks.isEmpty()) {
                                                 Stock stock = new Stock(jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString(),
                                                         parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantity").toString()),
-                                                        parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantity").toString()),
+                                                        parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantityFull").toString()),
+                                                        parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("inWayFromClient").toString()),
                                                         products.get(0));
                                                 session.save(stock);
                                             } else {
@@ -116,6 +117,11 @@ public class Update extends Thread {
                                                         + "'").executeUpdate();
                                                 session.createQuery("update Stock set quantityFull = "
                                                         + parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantityFull").toString())
+                                                        + " WHERE id = '"
+                                                        + stocks.get(0).getId()
+                                                        + "'").executeUpdate();
+                                                session.createQuery("update Stock set inWayFromClient = "
+                                                        + parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("inWayFromClient").toString())
                                                         + " WHERE id = '"
                                                         + stocks.get(0).getId()
                                                         + "'").executeUpdate();
