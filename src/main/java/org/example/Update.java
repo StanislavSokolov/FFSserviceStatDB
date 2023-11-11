@@ -20,13 +20,13 @@ public class Update extends Thread {
 
     @Override
     public void run() {
-        int count = 0;
+        int count = 1;
 
         super.run();
         while (true) {
             try {
                 update(count);
-                sleep(10000);
+                sleep(100000);
                 if (count > 1) count = 0;
                 else count++;
             } catch (InterruptedException e) {
@@ -143,7 +143,7 @@ public class Update extends Thread {
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
-//                                    System.out.println(response);
+                                    System.out.println(response);
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
                                         List<Item> items = session.createQuery("FROM Item WHERE odid LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString()).getResultList();
@@ -176,7 +176,7 @@ public class Update extends Thread {
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
-//                                    System.out.println(response);
+                                    System.out.println(response);
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
                                         List<Item> items = session.createQuery("FROM Item WHERE odid LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString()).getResultList();
@@ -193,21 +193,21 @@ public class Update extends Thread {
                                                     products.get(0));
                                             session.save(item);
                                         } else {
-                                            if (jsonObject.getJSONArray("price").getJSONObject(i).get("saleID").toString().substring(0, 0).equals("S"))
-                                                session.createQuery("update Item set status = 'sold' WHERE id = '"
-                                                    + items.get(0).getId()
-                                                    + "'").executeUpdate();
-                                            if (jsonObject.getJSONArray("price").getJSONObject(i).get("saleID").toString().substring(0, 0).equals("R")) {
-                                                session.createQuery("update Item set status = 'returned' WHERE id = '"
-                                                        + items.get(0).getId()
-                                                        + "'").executeUpdate();
-                                                session.createQuery("update Item set finishedPrice = '0' WHERE id = '"
-                                                        + items.get(0).getId()
-                                                        + "'").executeUpdate();
-                                                session.createQuery("update Item set forPay = '0' WHERE id = '"
-                                                        + items.get(0).getId()
-                                                        + "'").executeUpdate();
-                                            }
+//                                            if (jsonObject.getJSONArray("price").getJSONObject(i).get("saleID").toString().substring(0, 0).equals("S"))
+//                                                session.createQuery("update Item set status = 'sold' WHERE id = '"
+//                                                    + items.get(0).getId()
+//                                                    + "'").executeUpdate();
+//                                            if (jsonObject.getJSONArray("price").getJSONObject(i).get("saleID").toString().substring(0, 0).equals("R")) {
+//                                                session.createQuery("update Item set status = 'returned' WHERE id = '"
+//                                                        + items.get(0).getId()
+//                                                        + "'").executeUpdate();
+//                                                session.createQuery("update Item set finishedPrice = '0' WHERE id = '"
+//                                                        + items.get(0).getId()
+//                                                        + "'").executeUpdate();
+//                                                session.createQuery("update Item set forPay = '0' WHERE id = '"
+//                                                        + items.get(0).getId()
+//                                                        + "'").executeUpdate();
+//                                            }
                                         }
                                     }
                                 }
