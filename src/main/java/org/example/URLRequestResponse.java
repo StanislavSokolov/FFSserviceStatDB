@@ -55,6 +55,14 @@ public class URLRequestResponse {
                 dataAPI = "https://suppliers-api.wildberries.ru";
                 dataMethod = "/public/api/v1/updatePromocodes";
             }
+            if (methodNumber.equals("getList")) {
+                dataAPI = "https://suppliers-api.wildberries.ru";
+                dataMethod = "/content/v1/cards/cursor/list";
+            }
+            if (methodNumber.equals("getCard")) {
+                dataAPI = "https://suppliers-api.wildberries.ru";
+                dataMethod = "/content/v1/cards/filter";
+            }
         } else if (shopNumber.equals("ozon")) {
             dataAPI = "https://api-seller.ozon.ru";
             if (methodNumber.equals("list"))
@@ -133,8 +141,8 @@ public class URLRequestResponse {
         final CloseableHttpClient httpclient = HttpClients.createDefault();
         final HttpGet httpGet = new HttpGet(url.toURI());
         final List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("accept", "application/json"));
-        params.add(new BasicNameValuePair("Authorization", token));
+//        params.add(new BasicNameValuePair("accept", "application/json"));
+//        params.add(new BasicNameValuePair("Authorization", token));
         httpGet.setHeader("accept", "application/json");
         httpGet.setHeader("Authorization", token);
 
@@ -146,6 +154,37 @@ public class URLRequestResponse {
             return respond;
         }
     }
+
+    public static String getResponseFromURL(URL url, String token, String supplierArticle) throws IOException {
+
+        String reqBody = "";
+
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        httpURLConnection.setRequestProperty("accept", "application/json");
+        httpURLConnection.setRequestProperty("Authorization", token);
+        httpURLConnection.setDoOutput(true);
+        OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream());
+        reqBody = "{\"vendorCodes\":[\"" + supplierArticle + "\"],\"allowedCategoriesOnly\":true}";
+        writer.write(reqBody);
+        writer.close();
+
+        System.out.println(reqBody);
+
+        try {
+            InputStream in = httpURLConnection.getInputStream();
+            Scanner scanner = new Scanner(in);
+            scanner.useDelimiter("\\A");
+            boolean hasInput = scanner.hasNext();
+            if(hasInput) {
+                return scanner.next();
+            } else {
+                return  null;
+            }
+        } finally {
+            httpURLConnection.disconnect();
+        }
+    }
+
 
     public static String getResponseFromURL(URL url, String token, String client, String method, String product_id, String price) throws IOException, URISyntaxException {
 

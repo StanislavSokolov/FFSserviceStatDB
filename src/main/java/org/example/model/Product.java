@@ -37,6 +37,17 @@ public class Product {
     @OneToMany(mappedBy = "owner")
     private List<Item> items;
 
+    public List<Media> getMedias() {
+        return medias;
+    }
+
+    public void setMedias(List<Media> medias) {
+        this.medias = medias;
+    }
+
+    @OneToMany(mappedBy = "owner")
+    private List<Media> medias;
+
     public Product() {
     }
 
