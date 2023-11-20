@@ -9,6 +9,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.example.com.Key;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +22,7 @@ import java.util.*;
 
 public class URLRequestResponse {
 
-    public static URL generateURL(String shop, String method, String token) {
+    public static URL generateURL(String shop, String method, String token, ArrayList<Key> arrayList) {
         String shopNumber = shop;
         String methodNumber = method;
         String dataAPI = null;
@@ -62,6 +63,10 @@ public class URLRequestResponse {
             if (methodNumber.equals("getCard")) {
                 dataAPI = "https://suppliers-api.wildberries.ru";
                 dataMethod = "/content/v1/cards/filter";
+            }
+            if (methodNumber.equals("getRating")) {
+                dataAPI = "https://feedbacks-api.wildberries.ru";
+                dataMethod = "/api/v1/feedbacks/products/rating/nmid" + "?" + arrayList.get(0).getKey() + "=" + arrayList.get(0).getData();
             }
         } else if (shopNumber.equals("ozon")) {
             dataAPI = "https://api-seller.ozon.ru";
@@ -169,6 +174,29 @@ public class URLRequestResponse {
         writer.close();
 
         System.out.println(reqBody);
+
+        try {
+            InputStream in = httpURLConnection.getInputStream();
+            Scanner scanner = new Scanner(in);
+            scanner.useDelimiter("\\A");
+            boolean hasInput = scanner.hasNext();
+            if(hasInput) {
+                return scanner.next();
+            } else {
+                return  null;
+            }
+        } finally {
+            httpURLConnection.disconnect();
+        }
+    }
+
+    public static String getResponseFromURL2(URL url, String token) throws IOException {
+
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        httpURLConnection.setRequestProperty("accept", "application/json");
+        httpURLConnection.setRequestProperty("Authorization", token);
+        httpURLConnection.setDoOutput(true);
+
 
         try {
             InputStream in = httpURLConnection.getInputStream();

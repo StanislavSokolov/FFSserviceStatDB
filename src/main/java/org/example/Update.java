@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.com.Key;
 import org.example.model.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -10,6 +11,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -52,7 +54,7 @@ public class Update extends Thread {
                 for (User user : users) {
                     if (user.getNameShopWB() != null) {
                         if (user.getTokenStandartWB() != null) {
-                            generetedURL = URLRequestResponse.generateURL("wb", "info", user.getTokenStandartWB());
+                            generetedURL = URLRequestResponse.generateURL("wb", "info", user.getTokenStandartWB(), null);
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStandartWB());
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
@@ -85,7 +87,7 @@ public class Update extends Thread {
 
 
                         if (user.getTokenStatisticWB() != null) {
-                            generetedURL = URLRequestResponse.generateURL("wb", "stocks", user.getTokenStatisticWB());
+                            generetedURL = URLRequestResponse.generateURL("wb", "stocks", user.getTokenStatisticWB(), null);
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
                                 System.out.println(response);
@@ -140,17 +142,17 @@ public class Update extends Thread {
                 for (User user : users) {
                     if (user.getNameShopWB() != null) {
                         if (user.getTokenStandartWB() != null) {
-                            generetedURL = URLRequestResponse.generateURL("wb", "getCard", user.getTokenStandartWB());
+                            generetedURL = URLRequestResponse.generateURL("wb", "getCard", user.getTokenStandartWB(), null);
                             List<Product> products = session.createQuery("FROM Product").getResultList();
                             if (!products.isEmpty()) {
                                 for (Product product : products) {
                                     if (!product.getSupplierArticle().equals("")) {
                                         try {
                                             response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStandartWB(), product.getSupplierArticle());
-                                            System.out.println(response);
                                             if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
                                                 JSONObject jsonObject = new JSONObject(response);
                                                 if (jsonObject.getJSONArray("data").length() != 0) {
+                                                    System.out.println(response);
                                                     List<Media> medias = session.createQuery("FROM Media WHERE product_id LIKE " + product.getId()).getResultList();
                                                     if (medias.isEmpty()) {
                                                         for (int i = 0; i < jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length(); i++) {
@@ -166,13 +168,41 @@ public class Update extends Thread {
                                                             }
                                                         }
                                                     }
+                                                    session.createQuery("UPDATE Product set description = '" + jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("characteristics").getJSONObject(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("characteristics").length() - 1).get("Описание") + "' WHERE id = " + product.getId()).executeUpdate();
+
                                                 }
                                             }
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
                                     }
-
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (count == 2) {
+                for (User user : users) {
+                    if (user.getNameShopWB() != null) {
+                        if (user.getTokenStandartWB() != null) {
+                            List<Product> products = session.createQuery("FROM Product").getResultList();
+                            if (!products.isEmpty()) {
+                                for (Product product : products) {
+                                    if (!product.getSupplierArticle().equals("")) {
+                                        ArrayList<Key> keys = new ArrayList<>();
+                                        keys.add(new Key("nmId", product.getNmId()));
+                                        generetedURL = URLRequestResponse.generateURL("wb", "getRating", user.getTokenStandartWB(), keys);
+                                        try {
+                                            response = URLRequestResponse.getResponseFromURL2(generetedURL, user.getTokenStandartWB());
+                                            System.out.println(response);
+                                            if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
+                                                JSONObject jsonObject = new JSONObject(response);
+                                                session.createQuery("UPDATE Product set rating = '" + ((JSONObject) jsonObject.get("data")).get("valuation") + "' WHERE id = " + product.getId()).executeUpdate();
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -182,7 +212,7 @@ public class Update extends Thread {
                 for (User user : users) {
                     if (user.getNameShopWB() != null) {
                         if (user.getTokenStatisticWB() != null) {
-                            generetedURL = URLRequestResponse.generateURL("wb", "orders", user.getTokenStatisticWB());
+                            generetedURL = URLRequestResponse.generateURL("wb", "orders", user.getTokenStatisticWB(), null);
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
@@ -216,7 +246,7 @@ public class Update extends Thread {
                             } catch (IOException | URISyntaxException e) {
                                 e.printStackTrace();
                             }
-                            generetedURL = URLRequestResponse.generateURL("wb", "sales", user.getTokenStatisticWB());
+                            generetedURL = URLRequestResponse.generateURL("wb", "sales", user.getTokenStatisticWB(), null);
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
@@ -271,7 +301,7 @@ public class Update extends Thread {
                     if (user.getNameShopOzon() != null) {
                         if (user.getTokenClientOzon() != null) {
                             if (user.getTokenStatisticOzon() != null) {
-                                generetedURL = URLRequestResponse.generateURL("ozon", "list", "");
+                                generetedURL = URLRequestResponse.generateURL("ozon", "list", "", null);
                                 try {
                                     response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenClientOzon(),  user.getTokenStatisticOzon(), "list", "", "");
                                 } catch (IOException | URISyntaxException e) {
@@ -279,7 +309,7 @@ public class Update extends Thread {
                                 }
                                 JSONObject jsonObject = new JSONObject(response);
                                 JSONObject jsonObject1 = new JSONObject(String.valueOf(jsonObject.get("result")));
-                                generetedURL = URLRequestResponse.generateURL("ozon", "info", "0");
+                                generetedURL = URLRequestResponse.generateURL("ozon", "info", "0", null);
                                 String answerString = "";
                                 for (int i = 0; i < jsonObject1.getJSONArray("items").length(); i++) {
     //                                System.out.println(jsonObject1.getJSONArray("items").getJSONObject(i).get("product_id"));

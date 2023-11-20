@@ -31,6 +31,12 @@ public class Product {
     @Column(name = "shopName")
     private String shopName;
 
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "rating")
+    private String rating;
+
     @OneToMany(mappedBy = "owner")
     private List<Stock> stocks;
 
@@ -51,13 +57,47 @@ public class Product {
     public Product() {
     }
 
-    public Product(String supplierArticle, String nmId, String subject, int price, int discount, String shopName) {
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
+
+    public Product(String supplierArticle, String nmId, String subject, int price, int discount, String shopName, String description, String rating) {
         this.supplierArticle = supplierArticle;
         this.nmId = nmId;
         this.subject = subject;
         this.price = price;
         this.discount = discount;
         this.shopName = shopName;
+        this.description = description;
+        this.rating = rating;
     }
 
     public int getId() {
