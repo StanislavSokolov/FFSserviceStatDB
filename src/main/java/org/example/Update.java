@@ -20,7 +20,7 @@ public class Update extends Thread {
 
     @Override
     public void run() {
-        int count = 0;
+        int count = 1;
 
         super.run();
         while (true) {
@@ -68,7 +68,7 @@ public class Update extends Thread {
                                                     "",
                                                     parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("price").toString()),
                                                     parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("discount").toString()),
-                                                    "WB");
+                                                    "WB", "", "");
                                             session.save(product);
                                         } else {
                                             session.createQuery("update Product set price = "
@@ -156,14 +156,14 @@ public class Update extends Thread {
                                                     List<Media> medias = session.createQuery("FROM Media WHERE product_id LIKE " + product.getId()).getResultList();
                                                     if (medias.isEmpty()) {
                                                         for (int i = 0; i < jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length(); i++) {
-                                                            Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").get(i).toString(), product);
+                                                            Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").get(i).toString(), i + 1, product);
                                                             session.save(media);
                                                         }
                                                     } else {
                                                         if (medias.size() != jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length()) {
                                                             session.createQuery("DELETE Media WHERE product_id = " + product.getId()).executeUpdate();
                                                             for (int i = 0; i < jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length(); i++) {
-                                                                Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").get(i).toString(), product);
+                                                                Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").get(i).toString(), i + 1, product);
                                                                 session.save(media);
                                                             }
                                                         }
@@ -329,7 +329,7 @@ public class Update extends Thread {
                                                 jsonObject3.get("name").toString(),
                                                 (int) Float.parseFloat(jsonObject3.get("old_price").toString()),
                                                 (int) (100 * (1 - (Float.parseFloat(jsonObject3.get("price").toString()))/(Float.parseFloat(jsonObject3.get("old_price").toString())))),
-                                                "OZON");
+                                                "OZON", "", "");
                                         session.save(product);
                                     } else {
                                         session.createQuery("update Product set price = "

@@ -14,13 +14,25 @@ public class Media {
     @Column(name = "src")
     private String src;
 
+    @Column(name = "image")
+    private int image;
+
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product owner;
 
-    public Media(String src, Product owner) {
+    public int getImage() {
+        return image;
+    }
+
+    public void setImage(int image) {
+        this.image = image;
+    }
+
+    public Media(String src, int image, Product owner) {
         this.src = src;
         this.owner = owner;
+        this.image = image;
     }
 
     public int getId() {
