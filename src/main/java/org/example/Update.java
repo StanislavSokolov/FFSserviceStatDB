@@ -80,7 +80,7 @@ public class Update extends Thread {
                                         }
                                     }
                                 }
-                            } catch (IOException | URISyntaxException e) {
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -132,7 +132,7 @@ public class Update extends Thread {
                                         }
                                     }
                                 }
-                            } catch (IOException | URISyntaxException e) {
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -148,25 +148,32 @@ public class Update extends Thread {
                                 for (Product product : products) {
                                     if (!product.getSupplierArticle().equals("")) {
                                         try {
-                                            response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStandartWB(), product.getSupplierArticle());
+                                            response = URLRequestResponse.getResponseFromURLandBodyRequest(generetedURL, user.getTokenStandartWB(), product.getSupplierArticle());
                                             if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
                                                 JSONObject jsonObject = new JSONObject(response);
                                                 if (jsonObject.getJSONArray("data").length() != 0) {
                                                     System.out.println(response);
                                                     List<Media> medias = session.createQuery("FROM Media WHERE product_id LIKE " + product.getId()).getResultList();
                                                     if (medias.isEmpty()) {
-                                                        for (int i = 0; i < jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length(); i++) {
-                                                            Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").get(i).toString(), i + 1, product);
-                                                            session.save(media);
-                                                        }
-                                                    } else {
-                                                        if (medias.size() != jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length()) {
-                                                            session.createQuery("DELETE Media WHERE product_id = " + product.getId()).executeUpdate();
-                                                            for (int i = 0; i < jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length(); i++) {
-                                                                Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").get(i).toString(), i + 1, product);
-                                                                session.save(media);
+                                                        for (int i = 0; i < jsonObject.getJSONArray("data").length(); i++) {
+                                                            if (jsonObject.getJSONArray("data").getJSONObject(i).get("vendorCode").equals(product.getSupplierArticle())) {
+                                                                for (int j = 0; j < jsonObject.getJSONArray("data").getJSONObject(i).getJSONArray("mediaFiles").length(); j++) {
+                                                                    System.out.println(jsonObject.getJSONArray("data").getJSONObject(i).get("vendorCode"));
+                                                                    Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(i).getJSONArray("mediaFiles").get(j).toString(), j, product);
+                                                                    session.save(media);
+                                                                }
                                                             }
                                                         }
+
+
+//                                                    } else {
+//                                                        if (medias.size() != jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length()) {
+//                                                            session.createQuery("DELETE Media WHERE product_id = " + product.getId()).executeUpdate();
+//                                                            for (int i = 0; i < jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length(); i++) {
+//                                                                Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").get(i).toString(), i, product);
+//                                                                session.save(media);
+//                                                            }
+//                                                        }
                                                     }
                                                     session.createQuery("UPDATE Product set description = '" + jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("characteristics").getJSONObject(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("characteristics").length() - 1).get("Описание") + "' WHERE id = " + product.getId()).executeUpdate();
 
@@ -193,7 +200,7 @@ public class Update extends Thread {
                                         keys.add(new Key("nmId", product.getNmId()));
                                         generetedURL = URLRequestResponse.generateURL("wb", "getRating", user.getTokenStandartWB(), keys);
                                         try {
-                                            response = URLRequestResponse.getResponseFromURL2(generetedURL, user.getTokenStandartWB());
+                                            response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStandartWB());
                                             System.out.println(response);
                                             if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
                                                 JSONObject jsonObject = new JSONObject(response);
@@ -243,7 +250,7 @@ public class Update extends Thread {
                                         }
                                     }
                                 }
-                            } catch (IOException | URISyntaxException e) {
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                             generetedURL = URLRequestResponse.generateURL("wb", "sales", user.getTokenStatisticWB(), null);
@@ -290,7 +297,7 @@ public class Update extends Thread {
                                         }
                                     }
                                 }
-                            } catch (IOException | URISyntaxException e) {
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
