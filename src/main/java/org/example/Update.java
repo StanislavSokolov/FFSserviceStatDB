@@ -20,7 +20,7 @@ public class Update extends Thread {
 
     @Override
     public void run() {
-        int count = 1;
+        int count = 3;
 
         super.run();
         while (true) {
@@ -226,7 +226,7 @@ public class Update extends Thread {
                                     System.out.println(response);
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
-                                        List<Item> items = session.createQuery("FROM Item WHERE odid LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString()).getResultList();
+                                        List<Item> items = session.createQuery("FROM Item WHERE odid LIKE '" + jsonObject.getJSONArray("price").getJSONObject(i).get("gNumber").toString() + "'").getResultList();
                                         if (items.isEmpty()) {
                                             List<Product> products = session.createQuery("FROM Product WHERE nmId LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString()).getResultList();
                                             String status = "ordered";
@@ -236,8 +236,8 @@ public class Update extends Thread {
                                                     "",
                                                     (int) ((Float.parseFloat(jsonObject.getJSONArray("price").getJSONObject(i).get("totalPrice").toString())) * (1 - (Float.parseFloat(jsonObject.getJSONArray("price").getJSONObject(i).get("discountPercent").toString())) / 100)),
                                                     0,
-                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString(),
-                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("oblast").toString(),
+                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("gNumber").toString(),
+                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("regionName").toString(),
                                                     jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString(),
                                                     status,
                                                     products.get(0));
@@ -260,15 +260,15 @@ public class Update extends Thread {
                                     System.out.println(response);
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
-                                        List<Item> items = session.createQuery("FROM Item WHERE odid LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString()).getResultList();
+                                        List<Item> items = session.createQuery("FROM Item WHERE odid LIKE '" + jsonObject.getJSONArray("price").getJSONObject(i).get("gNumber").toString() + "'").getResultList();
                                         if (items.isEmpty()) {
                                             List<Product> products = session.createQuery("FROM Product WHERE nmId LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString()).getResultList();
                                             Item item = new Item("",
                                                     jsonObject.getJSONArray("price").getJSONObject(i).get("date").toString(),
                                                     (int) (Float.parseFloat(jsonObject.getJSONArray("price").getJSONObject(i).get("finishedPrice").toString())),
                                                     (int) (Float.parseFloat(jsonObject.getJSONArray("price").getJSONObject(i).get("forPay").toString())),
-                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("odid").toString(),
-                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("oblastOkrugName").toString(),
+                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("gNumber").toString(),
+                                                    jsonObject.getJSONArray("price").getJSONObject(i).get("regionName").toString(),
                                                     jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString(),
                                                     "sold",
                                                     products.get(0));
