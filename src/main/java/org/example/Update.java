@@ -5,7 +5,6 @@ import org.example.model.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -20,13 +19,13 @@ public class Update extends Thread {
 
     @Override
     public void run() {
-        int count = 3;
+        int count = 0;
 
         super.run();
         while (true) {
             try {
                 update(count);
-                sleep(100000);
+                sleep(10000);
                 if (count > 3) count = 0;
                 else count++;
             } catch (InterruptedException e) {
@@ -68,7 +67,7 @@ public class Update extends Thread {
                                                     "",
                                                     parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("price").toString()),
                                                     parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("discount").toString()),
-                                                    "WB", "", "");
+                                                    "wb", "", "");
                                             session.save(product);
                                         } else {
                                             session.createQuery("update Product set price = "
@@ -336,7 +335,7 @@ public class Update extends Thread {
                                                 jsonObject3.get("name").toString(),
                                                 (int) Float.parseFloat(jsonObject3.get("old_price").toString()),
                                                 (int) (100 * (1 - (Float.parseFloat(jsonObject3.get("price").toString()))/(Float.parseFloat(jsonObject3.get("old_price").toString())))),
-                                                "OZON", "", "");
+                                                "ozon", "", "");
                                         session.save(product);
                                     } else {
                                         session.createQuery("update Product set price = "
