@@ -1,6 +1,7 @@
 package org.example.model;
 
 import javax.persistence.*;
+import java.security.acl.Owner;
 import java.util.List;
 
 @Entity
@@ -42,6 +43,10 @@ public class Product {
 
     @OneToMany(mappedBy = "owner")
     private List<Item> items;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User owner;
 
     public List<Media> getMedias() {
         return medias;
@@ -89,7 +94,7 @@ public class Product {
         this.rating = rating;
     }
 
-    public Product(String supplierArticle, String nmId, String subject, int price, int discount, String shopName, String description, String rating) {
+    public Product(String supplierArticle, String nmId, String subject, int price, int discount, String shopName, String description, String rating, User owner) {
         this.supplierArticle = supplierArticle;
         this.nmId = nmId;
         this.subject = subject;
@@ -98,6 +103,7 @@ public class Product {
         this.shopName = shopName;
         this.description = description;
         this.rating = rating;
+        this.owner = owner;
     }
 
     public int getId() {
@@ -106,6 +112,14 @@ public class Product {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     public String getSupplierArticle() {

@@ -1,6 +1,10 @@
 package org.example.model;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -15,10 +19,6 @@ public class User {
     private String nameShopWB;
     @Column(name = "tokenStandartWB")
     private String tokenStandartWB;
-    @Column(name = "tokenStatisticWB")
-    private String tokenStatisticWB;
-    @Column(name = "tokenAdvertisingWB")
-    private String tokenAdvertisingWB;
 
     @Column(name = "nameShopOzon")
     private String nameShopOzon;
@@ -26,18 +26,50 @@ public class User {
     private String tokenClientOzon;
     @Column(name = "tokenStatisticOzon")
     private String tokenStatisticOzon;
+    @Column(name = "email")
+    private String email;
+    @Column(name = "password")
+    private String password;
+
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
+    private List<Product> products;
 
     public User() {
     }
 
-    public User(String nameShopWB, String tokenStandartWB, String tokenStatisticWB, String tokenAdvertisingWB, String nameShopOzon, String tokenClientOzon, String tokenStatisticOzon) {
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public User(String nameShopWB, String tokenStandartWB, String nameShopOzon, String tokenClientOzon, String tokenStatisticOzon, String email, String password) {
         this.nameShopWB = nameShopWB;
         this.tokenStandartWB = tokenStandartWB;
-        this.tokenStatisticWB = tokenStatisticWB;
-        this.tokenAdvertisingWB = tokenAdvertisingWB;
         this.nameShopOzon = nameShopOzon;
         this.tokenClientOzon = tokenClientOzon;
         this.tokenStatisticOzon = tokenStatisticOzon;
+        this.email = email;
+        this.password = password;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 
     public String getNameShopWB() {
@@ -54,22 +86,6 @@ public class User {
 
     public void setTokenStandartWB(String tokenStandartWB) {
         this.tokenStandartWB = tokenStandartWB;
-    }
-
-    public String getTokenStatisticWB() {
-        return tokenStatisticWB;
-    }
-
-    public void setTokenStatisticWB(String tokenStatisticWB) {
-        this.tokenStatisticWB = tokenStatisticWB;
-    }
-
-    public String getTokenAdvertisingWB() {
-        return tokenAdvertisingWB;
-    }
-
-    public void setTokenAdvertisingWB(String tokenAdvertisingWB) {
-        this.tokenAdvertisingWB = tokenAdvertisingWB;
     }
 
     public String getNameShopOzon() {
