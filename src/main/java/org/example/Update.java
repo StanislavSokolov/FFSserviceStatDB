@@ -101,108 +101,126 @@ public class Update extends Thread {
                         }
 
 
-//                        if (user.getTokenStatisticWB() != null) {
-//                            generetedURL = URLRequestResponse.generateURL("wb", "stocks", user.getTokenStatisticWB(), null);
-//                            try {
-//                                response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStatisticWB());
-//                                System.out.println(response);
-//                                if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
-//                                    JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
-//                                    for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
-//                                        List<Product> products = session.createQuery("FROM Product WHERE nmId LIKE " + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString()).getResultList();
-//                                        if (!products.isEmpty()) {
-//                                            if (products.get(0).getSupplierArticle().equals(""))
-//                                                session.createQuery("update Product set supplierArticle = '"
-//                                                        + jsonObject.getJSONArray("price").getJSONObject(i).get("supplierArticle").toString()
-//                                                        + "' WHERE nmId = '" + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString() + "'").executeUpdate();
-//                                            if (products.get(0).getSubject().equals(""))
-//                                                session.createQuery("update Product set subject = '"
-//                                                        + jsonObject.getJSONArray("price").getJSONObject(i).get("subject").toString()
-//                                                        + "' WHERE nmId = '" + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString() + "'").executeUpdate();
-//                                            List<Stock> stocks = session.createQuery("FROM Stock WHERE product_id LIKE " + products.get(0).getId() + " and warehouseName LIKE '" + jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString() + "'").getResultList();
-//                                            if (stocks.isEmpty()) {
-//                                                Stock stock = new Stock(jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString(),
-//                                                        parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantity").toString()),
-//                                                        parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantityFull").toString()),
-//                                                        parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("inWayFromClient").toString()),
-//                                                        products.get(0));
-//                                                session.save(stock);
-//                                            } else {
-//                                                session.createQuery("update Stock set quantity = "
-//                                                        + parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantity").toString())
-//                                                        + " WHERE id = '"
-//                                                        + stocks.get(0).getId()
-//                                                        + "'").executeUpdate();
-//                                                session.createQuery("update Stock set quantityFull = "
-//                                                        + parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantityFull").toString())
-//                                                        + " WHERE id = '"
-//                                                        + stocks.get(0).getId()
-//                                                        + "'").executeUpdate();
-//                                                session.createQuery("update Stock set inWayFromClient = "
-//                                                        + parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("inWayFromClient").toString())
-//                                                        + " WHERE id = '"
-//                                                        + stocks.get(0).getId()
-//                                                        + "'").executeUpdate();
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
+                        if (user.getTokenStandartWB() != null) {
+                            generetedURL = URLRequestResponse.generateURL("wb", "stocks", user.getTokenStandartWB(), null);
+                            try {
+                                response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStandartWB());
+                                System.out.println(response);
+                                if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
+                                    JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
+                                    for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
+                                        List<Product> products = user.getProducts();
+                                        if (!products.isEmpty()) {
+                                            for (Product p: products) {
+                                                if (p.getNmId().equals(jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString())) {
+                                                    if (p.getSupplierArticle().equals(""))
+                                                        session.createQuery("update Product set supplierArticle = '"
+                                                                + jsonObject.getJSONArray("price").getJSONObject(i).get("supplierArticle").toString()
+                                                                + "' WHERE nmId = '" + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString() + "'").executeUpdate();
+                                                    if (p.getSubject().equals(""))
+                                                        session.createQuery("update Product set subject = '"
+                                                                + jsonObject.getJSONArray("price").getJSONObject(i).get("subject").toString()
+                                                                + "' WHERE nmId = '" + jsonObject.getJSONArray("price").getJSONObject(i).get("nmId").toString() + "'").executeUpdate();
+                                                    List<Stock> stocks = p.getStocks();
+                                                    if (stocks.isEmpty()) {
+                                                        Stock stock = new Stock(jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString(),
+                                                                parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantity").toString()),
+                                                                parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantityFull").toString()),
+                                                                parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("inWayFromClient").toString()),
+                                                                p);
+                                                        session.save(stock);
+                                                    } else {
+                                                        boolean coincidence = false;
+                                                        for (Stock s: stocks) {
+                                                            if (s.getWarehouseName().equals(jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString())) {
+                                                                session.createQuery("update Stock set quantity = "
+                                                                        + parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantity").toString())
+                                                                        + " WHERE id = '"
+                                                                        + s.getId()
+                                                                        + "'").executeUpdate();
+                                                                session.createQuery("update Stock set quantityFull = "
+                                                                        + parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantityFull").toString())
+                                                                        + " WHERE id = '"
+                                                                        + s.getId()
+                                                                        + "'").executeUpdate();
+                                                                session.createQuery("update Stock set inWayFromClient = "
+                                                                        + parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("inWayFromClient").toString())
+                                                                        + " WHERE id = '"
+                                                                        + s.getId()
+                                                                        + "'").executeUpdate();
+                                                                coincidence = true;
+                                                            }
+                                                        }
+                                                        if (!coincidence) {
+                                                            Stock stock = new Stock(jsonObject.getJSONArray("price").getJSONObject(i).get("warehouseName").toString(),
+                                                                    parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantity").toString()),
+                                                                    parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("quantityFull").toString()),
+                                                                    parseInt(jsonObject.getJSONArray("price").getJSONObject(i).get("inWayFromClient").toString()),
+                                                                    p);
+                                                            session.save(stock);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
             } else if (count == 1) {
-//                for (User user : users) {
-//                    if (user.getNameShopWB() != null) {
-//                        if (user.getTokenStandartWB() != null) {
-//                            generetedURL = URLRequestResponse.generateURL("wb", "getCard", user.getTokenStandartWB(), null);
-//                            List<Product> products = session.createQuery("FROM Product").getResultList();
-//                            if (!products.isEmpty()) {
-//                                for (Product product : products) {
-//                                    if (!product.getSupplierArticle().equals("")) {
-//                                        try {
-//                                            response = URLRequestResponse.getResponseFromURLandBodyRequest(generetedURL, user.getTokenStandartWB(), product.getSupplierArticle());
-//                                            if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
-//                                                JSONObject jsonObject = new JSONObject(response);
-//                                                if (jsonObject.getJSONArray("data").length() != 0) {
-//                                                    System.out.println(response);
-//                                                    List<Media> medias = session.createQuery("FROM Media WHERE product_id LIKE " + product.getId()).getResultList();
-//                                                    if (medias.isEmpty()) {
-//                                                        for (int i = 0; i < jsonObject.getJSONArray("data").length(); i++) {
-//                                                            if (jsonObject.getJSONArray("data").getJSONObject(i).get("vendorCode").equals(product.getSupplierArticle())) {
-//                                                                for (int j = 0; j < jsonObject.getJSONArray("data").getJSONObject(i).getJSONArray("mediaFiles").length(); j++) {
-//                                                                    System.out.println(jsonObject.getJSONArray("data").getJSONObject(i).get("vendorCode"));
-//                                                                    Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(i).getJSONArray("mediaFiles").get(j).toString(), j, product);
-//                                                                    session.save(media);
-//                                                                }
+                for (User user : users) {
+                    if (user.getNameShopWB() != null) {
+                        if (user.getTokenStandartWB() != null) {
+                            generetedURL = URLRequestResponse.generateURL("wb", "getCard", user.getTokenStandartWB(), null);
+                            List<Product> products = user.getProducts();
+                            if (!products.isEmpty()) {
+                                for (Product p : products) {
+                                    if (!p.getSupplierArticle().equals("")) {
+                                        try {
+                                            response = URLRequestResponse.getResponseFromURLandBodyRequest(generetedURL, user.getTokenStandartWB(), p.getSupplierArticle());
+                                            if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
+                                                JSONObject jsonObject = new JSONObject(response);
+                                                if (jsonObject.getJSONArray("data").length() != 0) {
+                                                    System.out.println(response);
+                                                    List<Media> medias = p.getMedias();
+                                                    if (medias.isEmpty()) {
+                                                        for (int i = 0; i < jsonObject.getJSONArray("data").length(); i++) {
+                                                            if (jsonObject.getJSONArray("data").getJSONObject(i).get("vendorCode").equals(p.getSupplierArticle())) {
+                                                                for (int j = 0; j < jsonObject.getJSONArray("data").getJSONObject(i).getJSONArray("mediaFiles").length(); j++) {
+                                                                    System.out.println(jsonObject.getJSONArray("data").getJSONObject(i).get("vendorCode"));
+                                                                    Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(i).getJSONArray("mediaFiles").get(j).toString(), j, p);
+                                                                    session.save(media);
+                                                                }
+                                                            }
+                                                        }
+
+
+//                                                    } else {
+//                                                        if (medias.size() != jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length()) {
+//                                                            session.createQuery("DELETE Media WHERE product_id = " + product.getId()).executeUpdate();
+//                                                            for (int i = 0; i < jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length(); i++) {
+//                                                                Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").get(i).toString(), i, product);
+//                                                                session.save(media);
 //                                                            }
 //                                                        }
-//
-//
-////                                                    } else {
-////                                                        if (medias.size() != jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length()) {
-////                                                            session.createQuery("DELETE Media WHERE product_id = " + product.getId()).executeUpdate();
-////                                                            for (int i = 0; i < jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").length(); i++) {
-////                                                                Media media = new Media(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("mediaFiles").get(i).toString(), i, product);
-////                                                                session.save(media);
-////                                                            }
-////                                                        }
-//                                                    }
-//                                                    session.createQuery("UPDATE Product set description = '" + jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("characteristics").getJSONObject(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("characteristics").length() - 1).get("Описание") + "' WHERE id = " + product.getId()).executeUpdate();
-//
-//                                                }
-//                                            }
-//                                        } catch (IOException e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
+                                                    }
+                                                    session.createQuery("UPDATE Product set description = '" + jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("characteristics").getJSONObject(jsonObject.getJSONArray("data").getJSONObject(0).getJSONArray("characteristics").length() - 1).get("Описание") + "' WHERE id = " + p.getId()).executeUpdate();
+
+                                                }
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             } else if (count == 2) {
 //                for (User user : users) {
 //                    if (user.getNameShopWB() != null) {
