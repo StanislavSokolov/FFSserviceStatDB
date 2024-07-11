@@ -19,15 +19,15 @@ public class Update extends Thread {
 
     @Override
     public void run() {
-        int count = 1;
+        int count = 0;
 
         super.run();
         while (true) {
             try {
                 System.out.println("count: " + count);
                 update(count);
-                sleep(50000);
-                if (count > 2) count = 0;
+                sleep(100000);
+                if (count > 3) count = 0;
                 else count++;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -37,19 +37,24 @@ public class Update extends Thread {
 
     private void update(int count) {
 
-        SessionFactory sessionFactory = new Configuration().addAnnotatedClass(User.class).
-                addAnnotatedClass(Product.class).
-                addAnnotatedClass(Stock.class).
-                addAnnotatedClass(Item.class).
-                addAnnotatedClass(Media.class).
-                setProperty("hibernate.driver_class", "com.mysql.cj.jdbc.Driver").
-                setProperty("hibernate.connection.url", "jdbc:mysql://localhost/falconfamily").
-                setProperty("hibernate.connection.username", "root").
-                setProperty("hibernate.connection.password", "sokolOV_76991020").
-                setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect").
-                setProperty("hibernate.current_session_context_class", "thread").
-                setProperty("hibernate.show_sql", "false").
-                buildSessionFactory();
+        SessionFactory sessionFactory = null;
+        try {
+            sessionFactory = new Configuration().addAnnotatedClass(User.class).
+                    addAnnotatedClass(Product.class).
+                    addAnnotatedClass(Stock.class).
+                    addAnnotatedClass(Item.class).
+                    addAnnotatedClass(Media.class).
+                    setProperty("hibernate.driver_class", Settings.getProperties("hibernate.driver_class")).
+                    setProperty("hibernate.connection.url", Settings.getProperties("hibernate.connection.url")).
+                    setProperty("hibernate.connection.username", Settings.getProperties("hibernate.connection.username")).
+                    setProperty("hibernate.connection.password", Settings.getProperties("hibernate.connection.password")).
+                    setProperty("hibernate.dialect", Settings.getProperties("hibernate.dialect")).
+                    setProperty("hibernate.current_session_context_class", Settings.getProperties("hibernate.current_session_context_class")).
+                    setProperty("hibernate.show_sql", Settings.getProperties("hibernate.show_sql")).
+                    buildSessionFactory();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Session session = sessionFactory.getCurrentSession();
 
         try {
@@ -65,7 +70,7 @@ public class Update extends Thread {
                             generetedURL = URLRequestResponse.generateURL("wb", "info", user.getTokenStandartWB(), null);
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStandartWB());
-//                                System.out.println(response);
+                                System.out.println(response);
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
 //                                    JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     JSONObject jsonObject1 = new JSONObject(response);
@@ -82,7 +87,7 @@ public class Update extends Thread {
                                             session.save(product);
                                         } else {
                                             boolean coincidence = false;
-                                            for (Product p: products) {
+                                            for (Product p : products) {
                                                 if (p.getNmId().equals(jsonObject.getJSONArray("listGoods").getJSONObject(i).get("nmID").toString())) {
                                                     session.createQuery("update Product set price = "
                                                             + parseInt(jsonObject.getJSONArray("listGoods").getJSONObject(i).getJSONArray("sizes").getJSONObject(0).get("price").toString())
@@ -111,13 +116,16 @@ public class Update extends Thread {
                                 e.getMessage();
                             }
                         }
-
-
+                    }
+                }
+            } else if (count == 1) {
+                for (User user : users) {
+                    if (user.getNameShopWB() != null) {
                         if (user.getTokenStandartWB() != null) {
                             generetedURL = URLRequestResponse.generateURL("wb", "stocks", user.getTokenStandartWB(), null);
                             try {
                                 response = URLRequestResponse.getResponseFromURL(generetedURL, user.getTokenStandartWB());
-//                                System.out.println(response);
+                                System.out.println(response);
                                 if (!response.equals("{\"errors\":[\"(api-new) too many requests\"]}")) {
                                     JSONObject jsonObject = new JSONObject("{\"price\":" + response + "}");
                                     for (int i = 0; i < jsonObject.getJSONArray("price").length(); i++) {
@@ -183,7 +191,7 @@ public class Update extends Thread {
                         }
                     }
                 }
-            } else if (count == 1) {
+            } else if (count == 2) {
                 for (User user : users) {
                     if (user.getNameShopWB() != null) {
                         if (user.getTokenStandartWB() != null) {
@@ -238,7 +246,7 @@ public class Update extends Thread {
                         }
                     }
                 }
-            } else if (count == 2) {
+            } else if (count == 3) {
                 for (User user : users) {
                     if (user.getNameShopWB() != null) {
                         if (user.getTokenStandartWB() != null) {
