@@ -27,7 +27,7 @@ public class Update extends Thread {
                 System.out.println("count: " + count);
                 update(count);
                 sleep(100000);
-                if (count > 3) count = 0;
+                if (count > 2) count = 0;
                 else count++;
             } catch (InterruptedException e) {
                 e.printStackTrace();

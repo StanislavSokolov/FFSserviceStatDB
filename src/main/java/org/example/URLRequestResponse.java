@@ -33,7 +33,7 @@ public class URLRequestResponse {
                 dataMethod = "/api/v1/supplier/orders?dateFrom=" + getDate(-7) + "T00%3A00%3A00.000Z&key=" + token;
             }
             if (methodNumber.equals("info")) {
-                dataAPI = "https://discounts-prices-api.wb.ru";
+                dataAPI = "https://discounts-prices-api.wildberries.ru";
                 dataMethod = "/api/v2/list/goods/filter?limit=1000&offset=0";
             }
             if (methodNumber.equals("prices")) {
@@ -53,7 +53,7 @@ public class URLRequestResponse {
                 dataMethod = "/content/v1/cards/cursor/list";
             }
             if (methodNumber.equals("getCard")) {
-                dataAPI = "https://suppliers-api.wildberries.ru";
+                dataAPI = "https://content-api.wildberries.ru";
                 dataMethod = "/content/v2/get/cards/list";
             }
             if (methodNumber.equals("getRating")) {
@@ -182,16 +182,43 @@ public class URLRequestResponse {
         return getResponse(httpURLConnection);
     }
 
+//    private static String getResponse(HttpURLConnection httpURLConnection) throws IOException {
+//        try {
+//            InputStream in = httpURLConnection.getInputStream();
+//            Scanner scanner = new Scanner(in);
+//            scanner.useDelimiter("\\A");
+//            boolean hasInput = scanner.hasNext();
+//            if(hasInput) {
+//                return scanner.next();
+//            } else {
+//                return  null;
+//            }
+//        } finally {
+//            httpURLConnection.disconnect();
+//        }
+//    }
+
     private static String getResponse(HttpURLConnection httpURLConnection) throws IOException {
         try {
-            InputStream in = httpURLConnection.getInputStream();
-            Scanner scanner = new Scanner(in);
-            scanner.useDelimiter("\\A");
-            boolean hasInput = scanner.hasNext();
-            if(hasInput) {
-                return scanner.next();
+            int responseCode = httpURLConnection.getResponseCode();
+            System.out.println("Response Code: " + responseCode);
+
+            if (responseCode >= 400) {
+                // Обработка ошибок
+                try (InputStream errorStream = httpURLConnection.getErrorStream()) {
+                    if (errorStream != null) {
+                        Scanner scanner = new Scanner(errorStream).useDelimiter("\\A");
+                        return scanner.hasNext() ? scanner.next() : "No error message";
+                    } else {
+                        return "No error stream";
+                    }
+                }
             } else {
-                return  null;
+                // Обработка успешного ответа
+                try (InputStream in = httpURLConnection.getInputStream()) {
+                    Scanner scanner = new Scanner(in).useDelimiter("\\A");
+                    return scanner.hasNext() ? scanner.next() : "No response";
+                }
             }
         } finally {
             httpURLConnection.disconnect();
