@@ -246,7 +246,7 @@ public class Update extends Thread {
                         }
                     }
                 }
-            } else if (count == 3) {
+            } else if (count == 4) {
                 for (User user : users) {
                     if (user.getNameShopWB() != null) {
                         if (user.getTokenStandartWB() != null) {
